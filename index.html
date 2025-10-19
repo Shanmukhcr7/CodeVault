@@ -1,34 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FilePad - Secure File Sharing</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeVault</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>📁 FilePad</h1>
-    <p>Share files using a personal session key</p>
+  <h1>📁 CodeVault – File Storage via Google Drive</h1>
 
-    <div id="key-section">
-      <input type="text" id="keyInput" placeholder="Enter session key (e.g. qwerty)" />
-      <button id="enterBtn">Enter</button>
-    </div>
+  <input type="file" id="fileInput" multiple>
+  <button onclick="uploadFiles()">Upload</button>
 
-    <div id="file-section" class="hidden">
-      <h2>Session: <span id="currentKey"></span></h2>
-      <input type="file" id="fileInput" multiple />
-      <button id="uploadBtn">Upload</button>
-      <div id="message"></div>
-
-      <h3>Files in this session:</h3>
-      <ul id="fileList"></ul>
-    </div>
-  </div>
+  <h2>Uploaded Files:</h2>
+  <ul id="fileList"></ul>
 
   <script src="script.js"></script>
 </body>
 </html>
-
