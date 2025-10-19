@@ -57,6 +57,18 @@ async function uploadFiles() {
 
 async function deleteFile(id) {
   if (!confirm("Delete this file?")) return;
-  await fetch(`${SCRIPT_URL}?id=${id}`, { method: "DELETE" });
-  fetchFiles();
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "delete", id }),
+    });
+
+    const result = await res.json();
+    console.log(result);
+    fetchFiles();
+  } catch (err) {
+    console.error("Delete error:", err);
+  }
 }
+
