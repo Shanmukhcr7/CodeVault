@@ -1,0 +1,9 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow anyone to upload/download files in any session directory
+    match /sessionKey/{allPaths=**} {
+      allow read, write: if true;
+    }
+  }
+}

@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow anyone to read/write sessions
+    match /sessions/{sessionId} {
+      allow read, write: if true;
+
+      // Allow anyone to read/write files in any session
+      match /files/{fileId} {
+        allow read, write: if true;
+      }
+    }
+  }
+}

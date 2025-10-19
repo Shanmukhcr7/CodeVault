@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilePad - Secure File Sharing</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="landing-page" class="page active">
+        <div class="container">
+            <h1 class="title">FilePad</h1>
+            <p class="subtitle">Secure file sharing sessions</p>
+            <div class="key-input-container">
+                <input type="text" id="session-key" placeholder="Enter your session key" maxlength="50">
+                <button id="enter-btn" class="btn primary">Enter Session</button>
+            </div>
+            <div id="error-message" class="error"></div>
+        </div>
+    </div>
+
+    <div id="file-upload-page" class="page">
+        <div class="container">
+            <header class="session-header">
+                <h2>Session: <span id="session-title"></span></h2>
+                <button id="copy-link-btn" class="btn secondary">Copy Session Link</button>
+            </header>
+
+            <div id="drop-zone" class="drop-zone">
+                <div class="drop-zone-content">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17,8 12,3 7,8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <p>Drag & drop files here or click to browse</p>
+                    <input type="file" id="file-input" multiple hidden>
+                    <button id="select-files-btn" class="btn primary">Select Files</button>
+                </div>
+                <div id="upload-progress" class="upload-progress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <p id="progress-text">Uploading...</p>
+                </div>
+            </div>
+
+            <div id="files-list" class="files-list">
+                <h3>Uploaded Files</h3>
+                <div id="files-container">
+                    <p class="no-files">No files uploaded yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
