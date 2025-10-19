@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbyTnK_hurvaaO-awbBzCR0N1b3ur3nKRV2w13flFdsEDIa5X7aUjQc0GUscnX26vKrcEg/exec"; // <-- Replace with your Apps Script Web App URL
+const API_URL = "https://script.google.com/macros/s/AKfycbyuRi6WxprpukIAGzN9UmYID7_A7uhZ_xqT6az4Itd-N6RWY3o4EdaKOSHld3eKUtXAaA/exec"; // <-- Replace with your Apps Script Web App URL
 
 const keyInput = document.getElementById("sessionKey");
 const enterBtn = document.getElementById("enterBtn");
