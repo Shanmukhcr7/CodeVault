@@ -1,181 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FilePad (Drive)</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FilePad - Secure File Sharing</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>FilePad — Drive Sessions</h1>
-      <p>Type a session key to open or create a session. Only users with the key can see the files.</p>
-    </header>
+    <h1>📁 FilePad</h1>
+    <p>Share files using a personal session key</p>
 
-    <div class="session">
-      <input id="sessionInput" placeholder="Enter session key (e.g. qwerty)" />
+    <div id="key-section">
+      <input type="text" id="keyInput" placeholder="Enter session key (e.g. qwerty)" />
       <button id="enterBtn">Enter</button>
-      <button id="clearBtn">Clear</button>
-      <div id="currentSession" class="hidden">Session: <strong id="sessionLabel"></strong></div>
     </div>
 
-    <div id="uploader" class="hidden card">
-      <label class="fileInputLabel">Select files to upload</label>
+    <div id="file-section" class="hidden">
+      <h2>Session: <span id="currentKey"></span></h2>
       <input type="file" id="fileInput" multiple />
-      <button id="uploadBtn">Upload Selected</button>
-      <div id="uploadStatus"></div>
-    </div>
+      <button id="uploadBtn">Upload</button>
+      <div id="message"></div>
 
-    <div id="filesArea" class="hidden card">
-      <h3>Files in session</h3>
-      <div id="filesList">No files</div>
+      <h3>Files in this session:</h3>
+      <ul id="fileList"></ul>
     </div>
-
-    <footer>
-      <small>Built with Google Drive + Apps Script</small>
-    </footer>
   </div>
 
-<script>
-/* ---------- CONFIG: paste your Apps Script Web App URL here ---------- */
-const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby-kU9w9yEja0EzTRY9Inlmze_nImTLkRh1RcGBo70a1zJmf9MeZuRt40RaC86cvFGoOQ/exec";
-/* -------------------------------------------------------------------- */
-
-const $ = (id) => document.getElementById(id);
-
-const enterBtn = $("enterBtn");
-const clearBtn = $("clearBtn");
-const sessionInput = $("sessionInput");
-const sessionLabel = $("sessionLabel");
-const currentSession = $("currentSession");
-const uploader = $("uploader");
-const fileInput = $("fileInput");
-const uploadBtn = $("uploadBtn");
-const uploadStatus = $("uploadStatus");
-const filesArea = $("filesArea");
-const filesList = $("filesList");
-
-let currentSessionKey = null;
-
-function show(el){ el.classList.remove("hidden"); }
-function hide(el){ el.classList.add("hidden"); }
-
-enterBtn.addEventListener("click", () => {
-  const key = String(sessionInput.value || "").trim();
-  if (!key) { alert("Enter a session key."); return; }
-  openSession(key);
-});
-
-clearBtn.addEventListener("click", () => {
-  sessionInput.value = "";
-  currentSessionKey = null;
-  hide(uploader); hide(filesArea); hide(currentSession);
-});
-
-async function openSession(key) {
-  currentSessionKey = key;
-  sessionLabel.textContent = key;
-  show(currentSession);
-  show(uploader);
-  show(filesArea);
-  filesList.innerHTML = "Loading...";
-  await fetchFiles();
-}
-
-async function fetchFiles() {
-  try {
-    const url = new URL(GAS_WEBAPP_URL);
-    url.searchParams.set("action", "list");
-    url.searchParams.set("session", currentSessionKey);
-    const res = await fetch(url.toString());
-    const data = await res.json();
-    if (!data.success) { filesList.innerHTML = "Error fetching files"; return; }
-    if (!data.files || data.files.length === 0) {
-      filesList.innerHTML = "<em>No files yet. Upload one!</em>";
-      return;
-    }
-    filesList.innerHTML = "";
-    data.files.forEach(f => {
-      const div = document.createElement("div");
-      div.className = "fileRow";
-      const name = document.createElement("span");
-      name.className = "fileName";
-      name.textContent = f.name;
-      const size = document.createElement("small");
-      size.textContent = " (" + formatBytes(f.size) + ")";
-      const link = document.createElement("a");
-      link.href = f.downloadUrl;
-      link.target = "_blank";
-      link.textContent = "Download";
-      link.className = "downloadBtn";
-      div.appendChild(name);
-      div.appendChild(size);
-      div.appendChild(link);
-      filesList.appendChild(div);
-    });
-  } catch (err) {
-    filesList.innerHTML = "Error: " + err;
-  }
-}
-
-uploadBtn.addEventListener("click", async () => {
-  const files = fileInput.files;
-  if (!files || files.length === 0) { alert("Select file(s) first."); return; }
-  uploadStatus.innerHTML = "";
-  for (let i = 0; i < files.length; i++) {
-    const f = files[i];
-    uploadStatus.innerHTML += `<div>Uploading ${escapeHtml(f.name)} ...</div>`;
-    try {
-      const base64 = await readFileAsBase64(f);
-      // strip data:...;base64, prefix if present
-      const parts = base64.split(",");
-      const pureBase64 = parts.length > 1 ? parts[1] : parts[0];
-      const body = {
-        sessionKey: currentSessionKey,
-        filename: f.name,
-        mimeType: f.type || "application/octet-stream",
-        base64: pureBase64
-      };
-      const res = await fetch(GAS_WEBAPP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (data.success) {
-        uploadStatus.innerHTML += `<div class="ok">Uploaded: ${escapeHtml(f.name)}</div>`;
-      } else {
-        uploadStatus.innerHTML += `<div class="err">Failed: ${escapeHtml(f.name)} — ${escapeHtml(JSON.stringify(data.error))}</div>`;
-      }
-    } catch (err) {
-      uploadStatus.innerHTML += `<div class="err">Error uploading ${escapeHtml(f.name)}: ${escapeHtml(err.toString())}</div>`;
-    }
-  }
-  fileInput.value = "";
-  await fetchFiles();
-});
-
-function readFileAsBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(reader.error);
-    reader.onload = () => resolve(reader.result);
-    reader.readAsDataURL(file);
-  });
-}
-
-function formatBytes(bytes, decimals = 1) {
-  if (bytes === 0) return "0 B";
-  const k = 1024, dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["B","KB","MB","GB","TB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
-}
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
