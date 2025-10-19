@@ -1,74 +1,97 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMstKvZ0pw280ltKDgJ_ryjBmOQzGDg2QQ8h5mrUuEREQyV8u6Dr5MyWDP1Gay-tnloQ/exec"; // Replace this
-let sessionKey = null;
+const API_URL = "https://script.google.com/macros/s/AKfycbyTnK_hurvaaO-awbBzCR0N1b3ur3nKRV2w13flFdsEDIa5X7aUjQc0GUscnX26vKrcEg/exec"; // <-- Replace with your Apps Script Web App URL
 
-function enterSession() {
-  const keyInput = document.getElementById("keyInput").value.trim();
-  if (!keyInput) return alert("Please enter a valid key.");
+const keyInput = document.getElementById("sessionKey");
+const enterBtn = document.getElementById("enterBtn");
+const fileSection = document.getElementById("fileSection");
+const uploadBtn = document.getElementById("uploadBtn");
+const fileInput = document.getElementById("fileInput");
+const fileList = document.getElementById("fileList");
+const progressBar = document.getElementById("progressBar");
+const progress = document.getElementById("progress");
 
-  sessionKey = keyInput;
-  document.getElementById("sessionName").innerText = sessionKey;
-  document.getElementById("sessionArea").style.display = "block";
-  fetchFiles();
-}
+let currentKey = "";
+
+// Animate entry
+gsap.from(".container", { duration: 1, y: 50, opacity: 0, ease: "power3.out" });
+
+enterBtn.addEventListener("click", () => {
+  currentKey = keyInput.value.trim();
+  if (!currentKey) return alert("Please enter a key!");
+
+  gsap.to(".key-input", { opacity: 0, y: -20, duration: 0.5, onComplete: () => {
+    document.querySelector(".key-input").classList.add("hidden");
+    fileSection.classList.remove("hidden");
+    gsap.from("#fileSection", { opacity: 0, y: 30, duration: 0.8 });
+    fetchFiles();
+  }});
+});
 
 async function fetchFiles() {
-  try {
-    const response = await fetch(`${SCRIPT_URL}?key=${encodeURIComponent(sessionKey)}`);
-    const data = await response.json();
-    const list = document.getElementById("fileList");
-    list.innerHTML = "";
+  fileList.innerHTML = `<p>Loading files...</p>`;
+  const res = await fetch(`${API_URL}?key=${currentKey}`);
+  const data = await res.json();
 
-    if (data.files.length === 0) {
-      list.innerHTML = "<li>No files in this session yet.</li>";
-      return;
-    }
+  fileList.innerHTML = "";
 
-    data.files.forEach(f => {
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <a href="${f.url}" target="_blank">${f.name}</a>
-        <button onclick="deleteFile('${f.id}')">🗑️</button>
-      `;
-      list.appendChild(li);
-    });
-  } catch (err) {
-    console.error("Fetch error:", err);
+  if (!data.files || data.files.length === 0) {
+    fileList.innerHTML = `<p>No files found for key "${currentKey}". Upload some!</p>`;
+    return;
   }
+
+  data.files.forEach(file => {
+    const div = document.createElement("div");
+    div.classList.add("file-card");
+    div.innerHTML = `
+      <a href="${file.url}" target="_blank">${file.name}</a>
+      <button class="delete-btn" onclick="deleteFile('${file.id}')">Delete</button>
+    `;
+    fileList.appendChild(div);
+  });
 }
 
-async function uploadFiles() {
-  const input = document.getElementById("fileInput");
-  if (input.files.length === 0) return alert("Select at least one file.");
+uploadBtn.addEventListener("click", async () => {
+  const files = fileInput.files;
+  if (!files.length) return alert("Select a file!");
 
-  for (const file of input.files) {
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const base64 = e.target.result.split(",")[1];
-      const body = { key: sessionKey, name: file.name, type: file.type, file: base64 };
+  progressBar.style.display = "block";
+  progress.style.width = "0%";
 
-      const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(body) });
-      const result = await res.json();
-      console.log(result);
-      fetchFiles();
-    };
-    reader.readAsDataURL(file);
+  for (let file of files) {
+    await uploadFile(file);
   }
+
+  progress.style.width = "100%";
+  setTimeout(() => {
+    progressBar.style.display = "none";
+  }, 500);
+
+  fileInput.value = "";
+  fetchFiles();
+});
+
+async function uploadFile(file) {
+  progress.style.width = "20%";
+
+  // Simulate file upload with a small delay
+  await new Promise(r => setTimeout(r, 500));
+  const url = URL.createObjectURL(file); // simulate file storage link
+
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key: currentKey, name: file.name, url })
+  });
+
+  const data = await res.json();
+  console.log(data);
+  progress.style.width = "80%";
 }
 
 async function deleteFile(id) {
   if (!confirm("Delete this file?")) return;
 
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "delete", id }),
-    });
-
-    const result = await res.json();
-    console.log(result);
-    fetchFiles();
-  } catch (err) {
-    console.error("Delete error:", err);
-  }
+  const res = await fetch(`${API_URL}?id=${id}`, { method: "DELETE" });
+  const data = await res.json();
+  console.log(data);
+  fetchFiles();
 }
-
