@@ -1,31 +1,63 @@
-:root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#1fb6ff}
-*{box-sizing:border-box}
-body{
-  font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;
-  background:linear-gradient(180deg,#071021 0%, #081426 100%);
-  color:#e6eef8;
-  margin:0;padding:20px;
-  min-height:100vh;
-  display:flex;align-items:flex-start;justify-content:center;
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #4e54c8, #8f94fb);
+  color: white;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
 }
-.container{width:100%;max-width:900px}
-header h1{margin:0 0 4px;font-size:1.6rem}
-header p{margin:0 0 20px;color:var(--muted)}
-.card{background:rgba(255,255,255,0.03);padding:16px;border-radius:10px;margin-top:16px}
-.session{display:flex;gap:8px;align-items:center}
-.session input{flex:1;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit}
-button{background:var(--accent);border:none;padding:10px 12px;border-radius:8px;color:#001425;cursor:pointer}
-button:active{transform:translateY(1px)}
-.hidden{display:none}
-#currentSession{margin-left:8px;color:var(--muted)}
-.fileRow{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
-.fileName{flex:1;font-weight:600}
-.downloadBtn{text-decoration:none;padding:6px 8px;border-radius:6px;background:rgba(255,255,255,0.06);color:inherit}
-#uploadStatus .ok{color:#9ee6b0}
-#uploadStatus .err{color:#ffb3b3}
-footer{margin-top:28px;color:var(--muted);font-size:0.85rem}
-@media(max-width:600px){
-  header h1{font-size:1.2rem}
-  .session{flex-direction:column;align-items:stretch}
-  button{width:100%}
+
+.container {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+input[type="text"], input[type="file"] {
+  width: 80%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 8px;
+}
+
+button {
+  background: #00c6ff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0096c7;
+}
+
+.hidden {
+  display: none;
+}
+
+#fileList {
+  text-align: left;
+  list-style: none;
+  padding: 0;
+}
+
+#fileList li {
+  margin: 5px 0;
+  background: rgba(255,255,255,0.1);
+  padding: 8px;
+  border-radius: 6px;
+}
+
+a {
+  color: #00eaff;
+  text-decoration: none;
 }
