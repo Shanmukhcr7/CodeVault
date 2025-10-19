@@ -1,37 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CodeVault - FilePad</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeVault</title>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+
+<!-- CSS -->
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1 class="title">CodeVault</h1>
-    <p class="subtitle">Secure File Sessions with Personal Keys 🔐</p>
 
-    <div class="key-input">
-      <input type="text" id="sessionKey" placeholder="Enter or create a key..." />
-      <button id="enterBtn">Enter</button>
-    </div>
+<div class="container">
+  <h1>CodeVault</h1>
+  <p>Secure file storage with personal keys</p>
 
-    <div id="fileSection" class="hidden">
-      <div class="upload-area">
-        <input type="file" id="fileInput" multiple />
-        <button id="uploadBtn">Upload Files</button>
-      </div>
-
-      <div class="progress-bar" id="progressBar">
-        <div id="progress"></div>
-      </div>
-
-      <h2>Files in this Session</h2>
-      <div id="fileList"></div>
-    </div>
+  <div class="key-input">
+    <input type="text" id="keyInput" placeholder="Enter your key...">
+    <button onclick="fetchFiles()">Open</button>
   </div>
 
-  <script src="script.js"></script>
+  <div class="upload-section">
+    <input type="file" id="fileInput">
+    <button id="uploadBtn">Upload File</button>
+  </div>
+
+  <div id="loader">Loading...</div>
+
+  <div id="filesContainer" class="files-container"></div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
