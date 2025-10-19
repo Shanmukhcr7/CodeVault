@@ -3,19 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CodeVault</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>FilePad – Secure File Sharing</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>📁 CodeVault – File Storage via Google Drive</h1>
+  <div id="container">
+    <h1>📂 FilePad</h1>
+    <p>Enter your access key to view or upload files.</p>
 
-  <input type="file" id="fileInput" multiple>
-  <button onclick="uploadFiles()">Upload</button>
+    <input type="text" id="keyInput" placeholder="Enter session key (e.g. qwerty)">
+    <button onclick="enterSession()">Enter</button>
 
-  <h2>Uploaded Files:</h2>
-  <ul id="fileList"></ul>
+    <div id="sessionArea" style="display:none;">
+      <h2>Session: <span id="sessionName"></span></h2>
+      <input type="file" id="fileInput" multiple>
+      <button onclick="uploadFiles()">Upload Files</button>
+
+      <h3>Stored Files</h3>
+      <ul id="fileList"></ul>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
 </html>
-
