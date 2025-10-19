@@ -1,53 +1,53 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKFdCl_lTGK0UiKm3oNEX2cMMefeMKYiqvyaUoMP_QPWsJp8nV1x7bESfUCoCt2X4Rng/exec"; // Replace this
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMstKvZ0pw280ltKDgJ_ryjBmOQzGDg2QQ8h5mrUuEREQyV8u6Dr5MyWDP1Gay-tnloQ/exec"; // Replace this
+let sessionKey = null;
 
-// Fetch and display files
+function enterSession() {
+  const keyInput = document.getElementById("keyInput").value.trim();
+  if (!keyInput) return alert("Please enter a valid key.");
+
+  sessionKey = keyInput;
+  document.getElementById("sessionName").innerText = sessionKey;
+  document.getElementById("sessionArea").style.display = "block";
+  fetchFiles();
+}
+
 async function fetchFiles() {
   try {
-    const response = await fetch(SCRIPT_URL);
+    const response = await fetch(`${SCRIPT_URL}?key=${encodeURIComponent(sessionKey)}`);
     const data = await response.json();
-    const fileList = document.getElementById("fileList");
-    fileList.innerHTML = "";
+    const list = document.getElementById("fileList");
+    list.innerHTML = "";
 
     if (data.files.length === 0) {
-      fileList.innerHTML = "<li>No files found.</li>";
+      list.innerHTML = "<li>No files in this session yet.</li>";
       return;
     }
 
-    data.files.forEach(file => {
+    data.files.forEach(f => {
       const li = document.createElement("li");
       li.innerHTML = `
-        <a href="${file.url}" target="_blank">${file.name}</a>
-        <button onclick="deleteFile('${file.id}')">🗑️ Delete</button>
+        <a href="${f.url}" target="_blank">${f.name}</a>
+        <button onclick="deleteFile('${f.id}')">🗑️</button>
       `;
-      fileList.appendChild(li);
+      list.appendChild(li);
     });
-  } catch (error) {
-    console.error("Error fetching files:", error);
+  } catch (err) {
+    console.error("Fetch error:", err);
   }
 }
 
-// Upload files
 async function uploadFiles() {
   const input = document.getElementById("fileInput");
-  const files = input.files;
+  if (input.files.length === 0) return alert("Select at least one file.");
 
-  if (files.length === 0) return alert("Select at least one file!");
-
-  for (const file of files) {
+  for (const file of input.files) {
     const reader = new FileReader();
     reader.onload = async (e) => {
       const base64 = e.target.result.split(",")[1];
+      const body = { key: sessionKey, name: file.name, type: file.type, file: base64 };
 
-      const response = await fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          name: file.name,
-          type: file.type,
-          file: base64
-        }),
-      });
-
-      const result = await response.json();
+      const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(body) });
+      const result = await res.json();
       console.log(result);
       fetchFiles();
     };
@@ -55,12 +55,8 @@ async function uploadFiles() {
   }
 }
 
-// Delete file
-async function deleteFile(fileId) {
-  if (!confirm("Are you sure you want to delete this file?")) return;
-  await fetch(`${SCRIPT_URL}?id=${fileId}`, { method: "DELETE" });
+async function deleteFile(id) {
+  if (!confirm("Delete this file?")) return;
+  await fetch(`${SCRIPT_URL}?id=${id}`, { method: "DELETE" });
   fetchFiles();
 }
-
-// Initial load
-fetchFiles();
